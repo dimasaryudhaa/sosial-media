@@ -26,15 +26,15 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
         $request->session()->regenerate();
-    
+
         // Cek role user setelah login
         if (Auth::user()->role === 'admin') {
             return redirect()->route('admin.posts.index'); // Arahkan admin ke halaman admin/posts/index
         }
-    
+
         return redirect()->route('dashboard'); // Arahkan user ke dashboard
     }
-    
+
 
     /**
      * Destroy an authenticated session.
@@ -42,10 +42,10 @@ class AuthenticatedSessionController extends Controller
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();
-    
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-    
-        return redirect()->route('/'); // Mengarahkan kembali ke halaman login
+
+        return redirect()->route('login');
     }
 }

@@ -11,6 +11,7 @@ use App\Http\Controllers\Post\EditCommentController;
 use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\ChatController;
 
 Route::get('/', function () {
     return redirect()->route('login'); // Redirect ke halaman login
@@ -28,19 +29,27 @@ Route::get('/dashboard', [TimeLineController::class, 'index'])
 // Route untuk postingan
 Route::middleware('auth')->group(function () {
     Route::get('/admin', [AdminController::class, 'posts'])->name('admin.posts.index');
+
+    // ✅ Form untuk membuat postingan baru
+    Route::get('/post/create', function () {
+        return view('post.create');
+    })->name('post.create');
+
     Route::post('/post', [StorePostController::class, 'store'])->name('post.store');
     Route::get('/posts/{post}/edit', [StorePostController::class, 'edit'])->name('post.edit');
     Route::put('/posts/{post}', [StorePostController::class, 'update'])->name('post.update');
     Route::delete('/posts/{post}', [StorePostController::class, 'destroy'])->name('post.destroy');
     Route::post('/post/{post}/like', [StorePostController::class, 'like']);
 
-    // Route untuk komentar
+    // Komentar
     Route::post('/post/{post}/comments', StoreCommentController::class)->name('post.comments.store');
     Route::delete('/post/{post}/comments/{comment}', DeleteCommentController::class)->name('post.comments.destroy');
-
-    // Route untuk edit komentar (hanya pemilik komentar)
     Route::get('/post/{post}/comments/{comment}/edit', [EditCommentController::class, 'edit'])->name('post.comments.edit');
     Route::put('/post/{post}/comments/{comment}', [EditCommentController::class, 'update'])->name('post.comments.update');
+
+    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+    Route::get('/chat/messages/{id}', [ChatController::class, 'fetchMessages']);
+    Route::post('/chat/send', [ChatController::class, 'sendMessage']);
 });
 
 // Route untuk menampilkan detail postingan
@@ -53,6 +62,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/profile/update-photo', [ProfileController::class, 'updateProfilePhoto'])->name('profile.update.photo');
     Route::post('/profile/update-cover', [ProfileController::class, 'updateCoverPhoto'])->name('profile.update.cover');
+Route::get('/profile/{id}', [ProfileController::class, 'show'])->name('profile.show');
+
 });
 
 // Auth routes

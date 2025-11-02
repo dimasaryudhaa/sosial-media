@@ -1,38 +1,23 @@
 <x-app-layout>
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <form action="{{ route('post.store') }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <div class="mb-4">
-                            <textarea name="body" class="w-full block rounded textarea textarea-bordered @error('body') textarea-error @enderror" placeholder="Write your post"></textarea>
-                            @error('body')
-                                <span class="text-error">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <div class="mb-4">
-                            <input type="file" name="photo" class="file-input file-input-bordered w-full" accept="image/*">
-                            @error('photo')
-                                <span class="text-error">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <button type="submit" class="btn btn-primary">Post</button>
-                    </form>                    
-                </div>               
-            </div>   
-
+    <div class="py-12 bg-gray-100 min-h-screen">
+        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             @foreach ($posts as $post)
-            <div class="card bg-base-100 w-full shadow-xl my-4">
-                <div class="card-body">
-                    <div class="flex justify-between items-center">
-                        <h2 class="card-title flex items-center gap-2">
-                            <img src="{{ $post->user->profile_photo_url }}" alt="Profile" class="w-10 h-10 rounded-full border">
-                            <span>{{ $post->user->name }}</span>
-                            <span class="text-gray-500 text-sm">{{ $post->created_at->diffForHumans() }}</span>
-                        </h2>
+                <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="flex items-center">
+                            <a href="{{ route('profile.show', $post->user->id) }}">
+                                <img src="{{ $post->user->profile_photo_url }}" alt="Profile"
+                                    class="w-10 h-10 rounded-full border mr-3 hover:ring-2 hover:ring-blue-400 transition">
+                            </a>
+                            <div>
+                                <a href="{{ route('profile.show', $post->user->id) }}" class="font-semibold hover:underline">
+                                    {{ $post->user->name }}
+                                </a>
+
+                                <div class="text-sm text-gray-500">{{ $post->created_at->diffForHumans() }}</div>
+                            </div>
+                        </div>
+
                         <div x-data="{ open: false }" class="relative">
                             <button @click="open = !open" class="btn btn-sm btn-ghost">
                                 <i class="fa-solid fa-ellipsis-vertical"></i>
@@ -51,26 +36,25 @@
                             </div>
                         </div>
                     </div>
-    
-                    <p class="mt-2">{{ $post->body }}</p>
-    
+
+                    <p class="mb-3 text-gray-800">{{ $post->body }}</p>
+
                     @if ($post->photo)
-                        <img src="{{ asset('storage/' . $post->photo) }}" class="max-w-xs h-auto rounded-lg">
+                        <img src="{{ asset('storage/' . $post->photo) }}" class="w-full max-h-[400px] object-cover rounded-lg mb-3">
                     @endif
+
+                    <div class="flex items-center gap-4">
+                        <button onclick="likePost({{ $post->id }})" id="like-btn-{{ $post->id }}" class="flex items-center text-gray-600 hover:text-blue-600">
+                            <i class="fa-solid fa-thumbs-up mr-1"></i>
+                            <span id="like-count-{{ $post->id }}">{{ $post->likes_count }}</span>
+                        </button>
+
+                        <a href="{{ route('post.show', $post->id) }}" class="flex items-center text-gray-600 hover:text-blue-600">
+                            <i class="fa-solid fa-comment mr-1"></i>
+                            Comment ({{ $post->comments_count }})
+                        </a>
+                    </div>
                 </div>
-    
-                <div class="card-actions mx-4 mb-4 flex items-center justify-start gap-2">
-                    <button onclick="likePost({{ $post->id }})" id="like-btn-{{ $post->id }}" class="btn btn-sm btn-outline flex items-center">
-                        <i class="fa-solid fa-thumbs-up"></i>
-                        <span id="like-count-{{ $post->id }}" class="ml-1">{{ $post->likes_count }}</span>
-                    </button>
-    
-                    <a href="{{ route('post.show', $post->id) }}" class="btn btn-sm btn-outline flex items-center">
-                        <i class="fa-solid fa-comment"></i>
-                        <span class="ml-1">Comment ({{ $post->comments_count }})</span>
-                    </a>
-                </div>
-            </div>
             @endforeach
         </div>
     </div>

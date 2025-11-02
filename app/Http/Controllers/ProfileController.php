@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use App\Models\User;
 
 class ProfileController extends Controller
 {
@@ -18,14 +19,14 @@ class ProfileController extends Controller
     public function edit(Request $request): View
     {
         $user = $request->user();
-    
+
         // Ambil semua postingan user (termasuk yang tidak ada gambar)
         $posts = $user->posts()->latest()->get();
-    
+
         return view('profile.edit', compact('user', 'posts'));
     }
-    
-    
+
+
 
     /**
      * Update the user's profile information.
@@ -119,5 +120,22 @@ class ProfileController extends Controller
 
         return redirect()->route('profile.edit')->with('status', 'Cover photo updated successfully.');
     }
+
+        /**
+     * Tampilkan profil publik user lain
+     */
+public function show($id)
+{
+    // Ambil user berdasarkan ID
+    $user = \App\Models\User::findOrFail($id);
+
+    // Ambil postingan user
+    $posts = $user->posts()->latest()->get();
+
+    return view('profile.show', compact('user', 'posts'));
+}
+
+
+
 }
 

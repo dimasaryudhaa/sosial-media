@@ -1,7 +1,8 @@
 <x-app-layout>
+    <div class="py-12 bg-gray-50 min-h-screen">
+        <div class="max-w-5xl ml-72 mx-auto bg-white shadow sm:rounded-lg">
+            {{-- ↑ Tambah ml-72 agar konten menjauh dari sidebar (w-64 + jarak 2rem) --}}
 
-    <div class="py-12">
-        <div class="max-w-5xl mx-auto bg-white shadow sm:rounded-lg">
             <!-- Cover Photo Section -->
             <div class="relative">
                 @if(Auth::user()->cover_photo)
@@ -26,7 +27,6 @@
                     @if(Auth::user()->profile_photo)
                         <div class="relative w-28 h-28">
                             <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" class="w-full h-full rounded-full border-4 border-white shadow-md">
-                            <!-- Upload Profile Photo Button (Icon) -->
                             <form action="{{ route('profile.update.photo') }}" method="POST" enctype="multipart/form-data" class="absolute bottom-1 right-1">
                                 @csrf
                                 <label class="bg-black bg-opacity-50 text-white p-2 rounded-full cursor-pointer">
@@ -38,7 +38,6 @@
                     @else
                         <div class="relative w-28 h-28 rounded-full bg-gray-400 flex items-center justify-center border-4 border-white shadow-md">
                             <span class="text-white">No Profile</span>
-                            <!-- Upload Profile Photo Button (Icon) -->
                             <form action="{{ route('profile.update.photo') }}" method="POST" enctype="multipart/form-data" class="absolute bottom-1 right-1">
                                 @csrf
                                 <label class="bg-black bg-opacity-50 text-white p-2 rounded-full cursor-pointer">
@@ -52,10 +51,11 @@
                 </div>
             </div>
 
-            <div class="mt-10">
-                <h3 class="text-xl font-semibold mb-5 ml-5">Postingan Anda</h3>
-                
-                @foreach ($posts as $post)
+            <!-- Post Section -->
+            <div class="mt-16 px-6 pb-8">
+                <h3 class="text-xl font-semibold mb-5">Postingan Anda</h3>
+
+                @forelse ($posts as $post)
                     <div class="border rounded-lg p-4 shadow mb-4 relative">
                         <div class="flex items-center gap-2">
                             <img src="{{ Auth::user()->profile_photo_url }}" alt="Profile" class="w-8 h-8 rounded-full">
@@ -79,11 +79,9 @@
                             </form>
                         </div>
                     </div>
-                @endforeach
-
-                @if ($posts->isEmpty())
+                @empty
                     <p class="text-gray-500">Anda belum memiliki postingan.</p>
-                @endif
+                @endforelse
             </div>
         </div>
     </div>
