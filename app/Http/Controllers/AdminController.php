@@ -9,9 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
-    /**
-     * Display the admin's posts.
-     */
+
     public function posts(Request $request)
     {
         if ($request->ajax()) {
@@ -31,11 +29,6 @@ class AdminController extends Controller
         return view('admin.posts.index');
     }
     
-    
-
-    /**
-     * Show a single post.
-     */
     public function show($id)
     {
         $post = Post::where('id', $id)->where('user_id', Auth::id())->firstOrFail();

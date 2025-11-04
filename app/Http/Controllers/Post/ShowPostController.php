@@ -11,7 +11,7 @@ class ShowPostController extends Controller
     public function __invoke(Request $request, Post $post)
     {
         return view('post.show', [
-            'post' => $post->load(['comments.user', 'user']) // Pastikan relasi di-load
+            'post' => $post->load(['comments.user', 'user'])
         ]);
     }
 }

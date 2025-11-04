@@ -11,7 +11,7 @@ class ChatController extends Controller
 {
     public function index() {
         $users = User::where('id', '!=', Auth::id())->get();
-        $currentUser = Auth::user(); // Ambil data user yang sedang login
+        $currentUser = Auth::user();
         return view('chat.index', compact('users', 'currentUser'));
     }
 
@@ -24,7 +24,7 @@ class ChatController extends Controller
 
         return response()->json([
             'messages' => $messages,
-            'currentUser' => Auth::user() // Mengembalikan user yang login juga
+            'currentUser' => Auth::user()
         ]);
     }
 
@@ -37,7 +37,7 @@ class ChatController extends Controller
 
         return response()->json([
             'message' => $message,
-            'currentUser' => Auth::user() // Kirim data user yang login
+            'currentUser' => Auth::user()
         ]);
     }
 }

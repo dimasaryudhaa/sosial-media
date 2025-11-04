@@ -8,14 +8,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Post extends Model
 {
-    use HasFactory, SoftDeletes; // Tambahkan SoftDeletes
+    use HasFactory, SoftDeletes;
 
     protected $fillable = ['user_id', 'body', 'photo'];
 
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
-/*************  ✨ Codeium Command ⭐  *************/
     /**
      * The user that owns the post.
      *

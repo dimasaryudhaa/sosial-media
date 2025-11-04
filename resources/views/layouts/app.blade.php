@@ -58,6 +58,17 @@
                         <i class="fa-solid fa-pen-to-square mr-2"></i>Buat
                     </a>
 
+                    <a href="{{ route('notifications.index') }}"
+                    class="relative flex items-center px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 {{ request()->routeIs('notifications.index') ? 'bg-blue-200 font-semibold' : '' }}">
+                     <i class="fa-solid fa-bell mr-2"></i> Notifikasi
+                     @if (!empty($unreadCount) && $unreadCount > 0)
+                         <span class="absolute top-1 right-2 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 py-0.5">
+                             {{ $unreadCount }}
+                         </span>
+                     @endif
+                     </a>
+                 
+
                     <a href="{{ route('profile.edit') }}"
                     class="flex items-center px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 {{ request()->routeIs('profile.edit') ? 'bg-blue-200 font-semibold' : '' }}">
                         <i class="fa-solid fa-user-circle mr-2"></i> Profil

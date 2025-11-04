@@ -3,83 +3,73 @@
 namespace App\Http\Controllers\Post;
 
 use App\Models\Post;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests; 
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Like;
 
 class StorePostController extends Controller
 {
-    use AuthorizesRequests; 
+    use AuthorizesRequests;
 
-    
     public function store(Request $request)
     {
         $validated = $request->validate([
             'body' => ['required', 'string', 'max:140'],
-            'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'], // Tambahkan validasi foto
+            'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
         ]);
-    
+
         $photoPath = null;
-    
-        // Cek apakah ada file yang diunggah
+
         if ($request->hasFile('photo')) {
-            $photoPath = $request->file('photo')->store('posts', 'public'); // Simpan di storage/app/public/posts
+            $photoPath = $request->file('photo')->store('posts', 'public');
         }
-    
+
         Post::create([
             'user_id' => auth()->id(),
             'body' => $validated['body'],
-            'photo' => $photoPath, // Simpan path foto ke database
+            'photo' => $photoPath,
         ]);
-    
+
         return redirect()->route('dashboard')->with('success', 'Post berhasil dibuat!');
     }
-    
 
-    /**
-     * Menampilkan form edit postingan
-     */
     public function edit(Post $post)
     {
-        $this->authorize('update', $post); // Pastikan hanya pemilik yang bisa edit
-        return view('post.edit', compact('post')); // Harus sesuai dengan lokasi Blade
+        $this->authorize('update', $post);
+        return view('post.edit', compact('post'));
     }
-    
 
-    /**
-     * Memperbarui postingan
-     */
     public function update(Request $request, Post $post)
     {
         $this->authorize('update', $post);
-    
+
         $validated = $request->validate([
             'body' => ['required', 'string', 'max:140'],
             'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
         ]);
-    
+
         if ($request->hasFile('photo')) {
-            // Hapus foto lama jika ada
             if ($post->photo) {
                 Storage::disk('public')->delete($post->photo);
             }
-            // Simpan foto baru
             $validated['photo'] = $request->file('photo')->store('posts', 'public');
         }
-    
+
         $post->update($validated);
-    
+
         return redirect()->route('dashboard')->with('success', 'Post berhasil diperbarui!');
     }
-    
 
-    /**
-     * Menghapus postingan
-     */
     public function destroy(Post $post)
     {
-        $this->authorize('delete', $post); // ✅ Pastikan hanya pemilik bisa hapus
+        $this->authorize('delete', $post);
+
+        if ($post->photo) {
+            Storage::disk('public')->delete($post->photo);
+        }
 
         $post->delete();
 
@@ -87,21 +77,27 @@ class StorePostController extends Controller
     }
 
     public function like(Post $post)
-{
-    $user = auth()->user();
+    {
+        $user = auth()->user();
 
-    // Cek apakah user sudah like
-    $existingLike = $post->likes()->where('user_id', $user->id)->first();
+        $existingLike = $post->likes()->where('user_id', $user->id)->first();
 
-    if ($existingLike) {
-        // Jika sudah like, maka unlike
-        $existingLike->delete();
-    } else {
-        // Jika belum, maka like
-        $post->likes()->create(['user_id' => $user->id]);
+        if ($existingLike) {
+            $existingLike->delete();
+        } else {
+            $like = $post->likes()->create(['user_id' => $user->id]);
+
+            if ($post->user_id !== $user->id) {
+                Notification::create([
+                    'user_id' => $post->user_id, 
+                    'from_user_id' => $user->id, 
+                    'post_id' => $post->id,
+                    'notifiable_id' => $like->id,
+                    'notifiable_type' => Like::class,
+                ]);
+            }
+        }
+
+        return response()->json(['likes' => $post->likes()->count()]);
     }
-
-    return response()->json(['likes' => $post->likes()->count()]);
-}
-
 }

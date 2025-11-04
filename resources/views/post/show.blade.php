@@ -8,7 +8,6 @@
                 </div>
             @endif
 
-            <!-- Post Detail -->
             <div class="bg-white rounded-xl shadow-md p-6">
                 <div class="flex justify-between items-center mb-3">
                     <h2 class="text-lg font-semibold text-gray-800">
@@ -19,7 +18,6 @@
                 <p class="text-gray-700 leading-relaxed">{{ $post->body }}</p>
             </div>
 
-            <!-- Form Komentar -->
             <div class="bg-white rounded-xl shadow-md p-6">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
                     <i class="fa-solid fa-pen-to-square text-blue-600"></i>
@@ -40,8 +38,7 @@
                     </button>
                 </form>
             </div>
-
-            <!-- Daftar Komentar -->
+            
             <div class="space-y-4">
                 @forelse ($post->comments as $comment)
                     <div class="bg-white rounded-xl shadow-md p-5">

@@ -8,15 +8,11 @@
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 bg-white p-6 shadow-md rounded">
             <h3 class="text-lg font-semibold mb-4">Edit Komentar</h3>
-
-            <!-- Alert jika ada pesan sukses -->
             @if (session('success'))
                 <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
                     {{ session('success') }}
                 </div>
             @endif
-
-            <!-- Form Edit Komentar -->
             <form action="{{ route('post.comments.update', [$comment->post_id, $comment]) }}" method="POST">
                 @csrf
                 @method('PUT')

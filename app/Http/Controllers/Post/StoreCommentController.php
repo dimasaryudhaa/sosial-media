@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Post;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Post;
+use App\Models\Notification;
 use App\Models\Comment;
-use App\Notifications\PostCommented;
 
 class StoreCommentController extends Controller
 {
@@ -15,15 +15,20 @@ class StoreCommentController extends Controller
         $data = $request->validate([
             'body' => ['required', 'string', 'max:140'],
         ]);
-        
-        // Gunakan $request->user()->id, bukan $request->user()->id()
+
         $data['user_id'] = $request->user()->id;
 
-        // Simpan komentar
         $comment = $post->comments()->create($data);
 
-        // Kirim notifikasi ke pemilik post
-        $post->user->notify(new PostCommented($comment));
+        if ($post->user_id !== $request->user()->id) {
+            Notification::create([
+                'user_id' => $post->user_id,
+                'from_user_id' => $request->user()->id,
+                'post_id' => $post->id,
+                'notifiable_id' => $comment->id,
+                'notifiable_type' => Comment::class,
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Komentar berhasil dibuat!');
     }

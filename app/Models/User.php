@@ -60,13 +60,13 @@ class User extends Authenticatable
     }
 
     public function getProfilePhotoUrlAttribute()
-{
-    return $this->profile_photo ? asset('storage/' . $this->profile_photo) : 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&size=128';
-}
+    {
+        return $this->profile_photo ? asset('storage/' . $this->profile_photo) : 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&size=128';
+    }
 
-public function isAdmin()
-{
-    return $this->role === 'admin';
-}
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
 
 }

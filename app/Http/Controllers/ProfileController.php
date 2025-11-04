@@ -13,24 +13,14 @@ use App\Models\User;
 
 class ProfileController extends Controller
 {
-    /**
-     * Display the user's profile form.
-     */
     public function edit(Request $request): View
     {
         $user = $request->user();
-
-        // Ambil semua postingan user (termasuk yang tidak ada gambar)
         $posts = $user->posts()->latest()->get();
 
         return view('profile.edit', compact('user', 'posts'));
     }
 
-
-
-    /**
-     * Update the user's profile information.
-     */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $request->user()->fill($request->validated());
@@ -44,9 +34,6 @@ class ProfileController extends Controller
         return Redirect::route('profile.edit')->with('status', 'Profile updated successfully.');
     }
 
-    /**
-     * Delete the user's account.
-     */
     public function destroy(Request $request): RedirectResponse
     {
         $request->validateWithBag('userDeletion', [
@@ -55,7 +42,6 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
-        // Hapus foto profil dan cover sebelum menghapus user
         if ($user->profile_photo) {
             Storage::disk('public')->delete($user->profile_photo);
         }
@@ -73,9 +59,6 @@ class ProfileController extends Controller
         return Redirect::to('/');
     }
 
-    /**
-     * Update Profile Photo
-     */
     public function updateProfilePhoto(Request $request)
     {
         $request->validate([
@@ -84,12 +67,10 @@ class ProfileController extends Controller
 
         $user = Auth::user();
 
-        // Hapus foto lama jika ada
         if ($user->profile_photo) {
             Storage::disk('public')->delete($user->profile_photo);
         }
 
-        // Simpan foto baru
         $path = $request->file('profile_photo')->store('profile-photos', 'public');
         $user->profile_photo = $path;
         $user->save();
@@ -97,9 +78,6 @@ class ProfileController extends Controller
         return back()->with('success', 'Profile photo updated successfully.');
     }
 
-    /**
-     * Update Cover Photo
-     */
     public function updateCoverPhoto(Request $request)
     {
         $request->validate([
@@ -108,12 +86,10 @@ class ProfileController extends Controller
 
         $user = Auth::user();
 
-        // Hapus foto lama jika ada
         if ($user->cover_photo) {
             Storage::disk('public')->delete($user->cover_photo);
         }
 
-        // Simpan foto baru
         $path = $request->file('cover_photo')->store('cover-photos', 'public');
         $user->cover_photo = $path;
         $user->save();
@@ -121,19 +97,13 @@ class ProfileController extends Controller
         return redirect()->route('profile.edit')->with('status', 'Cover photo updated successfully.');
     }
 
-        /**
-     * Tampilkan profil publik user lain
-     */
-public function show($id)
-{
-    // Ambil user berdasarkan ID
-    $user = \App\Models\User::findOrFail($id);
+    public function show($id)
+    {
+        $user = User::findOrFail($id);
+        $posts = $user->posts()->latest()->get();
 
-    // Ambil postingan user
-    $posts = $user->posts()->latest()->get();
-
-    return view('profile.show', compact('user', 'posts'));
-}
+        return view('profile.show', compact('user', 'posts'));
+    }
 
 
 

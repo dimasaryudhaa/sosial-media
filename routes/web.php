@@ -12,6 +12,7 @@ use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\NotificationController;
 
 Route::get('/', function () {
     return redirect()->route('login'); // Redirect ke halaman login
@@ -21,19 +22,19 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->middleware('auth')
     ->name('logout');
 
-// Halaman utama setelah login
 Route::get('/dashboard', [TimeLineController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-// Route untuk postingan
 Route::middleware('auth')->group(function () {
     Route::get('/admin', [AdminController::class, 'posts'])->name('admin.posts.index');
 
-    // ✅ Form untuk membuat postingan baru
     Route::get('/post/create', function () {
         return view('post.create');
     })->name('post.create');
+    
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/read/{id}', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 
     Route::post('/post', [StorePostController::class, 'store'])->name('post.store');
     Route::get('/posts/{post}/edit', [StorePostController::class, 'edit'])->name('post.edit');
@@ -41,7 +42,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/posts/{post}', [StorePostController::class, 'destroy'])->name('post.destroy');
     Route::post('/post/{post}/like', [StorePostController::class, 'like']);
 
-    // Komentar
     Route::post('/post/{post}/comments', StoreCommentController::class)->name('post.comments.store');
     Route::delete('/post/{post}/comments/{comment}', DeleteCommentController::class)->name('post.comments.destroy');
     Route::get('/post/{post}/comments/{comment}/edit', [EditCommentController::class, 'edit'])->name('post.comments.edit');
@@ -52,19 +52,16 @@ Route::middleware('auth')->group(function () {
     Route::post('/chat/send', [ChatController::class, 'sendMessage']);
 });
 
-// Route untuk menampilkan detail postingan
-Route::get('/post/{post}', ShowPostController::class)->name('post.show');
+    Route::get('/post/{post}', ShowPostController::class)->name('post.show');
 
-// Route untuk profil
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::post('/profile/update-photo', [ProfileController::class, 'updateProfilePhoto'])->name('profile.update.photo');
-    Route::post('/profile/update-cover', [ProfileController::class, 'updateCoverPhoto'])->name('profile.update.cover');
-Route::get('/profile/{id}', [ProfileController::class, 'show'])->name('profile.show');
+    Route::middleware('auth')->group(function () {
+        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+        Route::post('/profile/update-photo', [ProfileController::class, 'updateProfilePhoto'])->name('profile.update.photo');
+        Route::post('/profile/update-cover', [ProfileController::class, 'updateCoverPhoto'])->name('profile.update.cover');
+    Route::get('/profile/{id}', [ProfileController::class, 'show'])->name('profile.show');
 
 });
 
-// Auth routes
 require __DIR__.'/auth.php';

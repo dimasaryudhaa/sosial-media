@@ -7,8 +7,6 @@
                     {{ session('success') }}
                 </div>
             @endif
-
-            <!-- Edit Post -->
             <div class="bg-white rounded-xl shadow-md p-6">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
                     <i class="fa-solid fa-pen-to-square text-blue-600"></i>
@@ -18,8 +16,6 @@
                 <form action="{{ route('post.update', $post->id) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                     @csrf
                     @method('PUT')
-
-                    <!-- Input teks -->
                     <textarea 
                         name="body" 
                         rows="4"
@@ -28,16 +24,12 @@
                     @error('body')
                         <p class="text-red-600 text-sm">{{ $message }}</p>
                     @enderror
-
-                    <!-- Gambar yang sudah ada -->
                     @if ($post->photo)
                         <div class="mt-4">
                             <p class="text-gray-600 text-sm mb-2">Gambar Saat Ini:</p>
                             <img src="{{ asset('storage/' . $post->photo) }}" class="rounded-lg w-full max-w-md shadow">
                         </div>
                     @endif
-
-                    <!-- Input file (disamakan tampilannya dengan form tambah postingan) -->
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Ganti Gambar (Opsional)</label>
                         <input 
@@ -53,8 +45,6 @@
                             <span class="text-red-500 text-sm">{{ $message }}</span>
                         @enderror
                     </div>
-
-                    <!-- Tombol Aksi -->
                     <div class="flex justify-between mt-6">
                         <a href="{{ route('dashboard') }}" class="btn btn-outline">
                             <i class="fa-solid fa-arrow-left mr-2"></i> Batal
